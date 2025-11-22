@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PhotoController; // Ya tenías esto, ¡bien!
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\Auth\GoogleController;
 
 /*
@@ -17,12 +17,16 @@ Route::get('/', function () {
 // --- GRUPO DE RUTAS PROTEGIDAS (Solo usuarios logueados) ---
 Route::middleware(['auth'])->group(function () {
     
-    // 1. El Dashboard (Tu página principal privada)
+    // 1. El Dashboard (ACTUALIZADO: Ahora busca las fotos antes de mostrar la vista)
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        // Buscamos las fotos del usuario logueado
+        $photos = Illuminate\Support\Facades\Auth::user()->photos()->latest()->get();
+        
+        // Enviamos la variable $photos a la vista
+        return view('dashboard', compact('photos'));
     })->name('dashboard');
 
-    // 2. La Ruta para Subir Fotos (LA NUEVA)
+    // 2. La Ruta para Subir Fotos
     Route::post('/photos', [PhotoController::class, 'store'])->name('photos.store');
 
 });
