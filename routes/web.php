@@ -1,29 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PhotoController; // Ya tenías esto, ¡bien!
+use App\Http\Controllers\Auth\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+// --- GRUPO DE RUTAS PROTEGIDAS (Solo usuarios logueados) ---
+Route::middleware(['auth'])->group(function () {
+    
+    // 1. El Dashboard (Tu página principal privada)
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
+    // 2. La Ruta para Subir Fotos (LA NUEVA)
+    Route::post('/photos', [PhotoController::class, 'store'])->name('photos.store');
 
-use App\Http\Controllers\Auth\GoogleController;
+});
 
+// --- RUTAS DE GOOGLE ---
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
+
 require __DIR__.'/auth.php';
