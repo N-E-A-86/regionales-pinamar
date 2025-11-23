@@ -51,15 +51,27 @@
                 <span class="block">El Mate Más Grande</span>
                 <span class="block text-brand-orange">De Pinamar</span>
             </h1>
-            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-400 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-yellow-100 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
                 ¡Sube tu foto, consigue likes y gana premios exclusivos!
             </p>
             <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
                 <div class="rounded-md shadow">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-bold rounded-md text-black bg-brand-orange hover:bg-brand-orange-darker md:py-4 md:text-lg md:px-10">
+                        <!-- <a href="{{ route('dashboard') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-bold rounded-md text-black bg-brand-orange hover:bg-brand-orange-darker md:py-4 md:text-lg md:px-10">
                             📸 Subir mi Foto
-                        </a>
+                        </a> -->
+                        <a href="{{ route('dashboard') }}" class="w-full 
+    flex items-center justify-center 
+    px-8 py-2
+    border border-transparent 
+    text-2xl font-bold 
+    rounded-md 
+    text-black 
+    bg-brand-orange hover:bg-brand-orange-darker 
+    md:py-4 md:text-3xl md:px-10">
+    
+    📸 Subir mi Foto
+</a>
                     @else
                         <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-brand-orange hover:bg-brand-orange-darker md:py-4 md:text-lg md:px-10">
                             🚀 Participar Ahora

@@ -33,12 +33,12 @@
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
                                 file:bg-orange-50 file:text-orange-700
-                                hover:file:bg-orange-100
-                                dark:file:bg-gray-700 dark:file:text-gray-200
+                                hover:file:bg-blue-300
+                                dark:file:bg-white-700 dark:file:text-black
                                 ">
                         </div>
 
-                        <button type="submit" class="bg-brand-orange hover:bg-brand-orange-darker text-white font-bold py-2 px-4 rounded">
+                        <button type="submit" class="bg-brand-orange hover:bg-brand-orange-darker text-black font-bold py-2 px-4 rounded">
                             Subir Recuerdo
                         </button>
                     </form>
