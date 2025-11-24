@@ -31,5 +31,20 @@ class PhotoController extends Controller
 
         // 4. Redirigir al usuario con un mensaje de éxito
         return redirect()->route('dashboard')->with('status', '¡Tu foto ha sido subida! Espera a que sea aprobada.');
+}
+// Mostrar una foto individual en grande
+    public function show($id)
+    {
+        // Buscamos la foto por ID, y traemos también los datos del usuario dueño
+        $photo = Photo::with('user')->findOrFail($id);
+
+        // Si la foto no está aprobada y el que mira NO es el dueño ni admin, error 404
+        if ($photo->status != 'approved') {
+             if (auth()->id() != $photo->user_id && (!auth()->user() || auth()->user()->role != 'admin')) {
+                 abort(404);
+             }
+        }
+
+        return view('photos.show', compact('photo'));
     }
 }

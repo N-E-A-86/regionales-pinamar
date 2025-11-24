@@ -22,6 +22,8 @@ Route::get('/', function () {
 
     return view('welcome', compact('photos'));
 });
+// Ver foto individual
+Route::get('/photos/{id}', [PhotoController::class, 'show'])->name('photos.show');
 
 // --- GRUPO DE RUTAS PROTEGIDAS (Solo usuarios logueados) ---
 Route::middleware(['auth'])->group(function () {

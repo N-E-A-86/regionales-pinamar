@@ -91,40 +91,56 @@
                 </div>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    @foreach($photos as $photo)
-                        <div class="bg-white dark:bg-dark-card rounded-lg shadow-lg overflow-hidden transition hover:scale-105 duration-300">
-                            <!-- Imagen -->
-                            <div class="h-64 overflow-hidden bg-gray-200 dark:bg-gray-800">
-                                <img src="{{ asset('storage/' . $photo->file_path) }}" 
-                                     alt="Foto de {{ $photo->user->name }}" 
-                                     class="w-full h-full object-cover">
-                            </div>
-
-                            <!-- Info y Botones -->
-                            <div class="p-4">
-                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
-                                    {{ $photo->user->name }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                                    {{ $photo->created_at->diffForHumans() }}
-                                </p>
-
-                                <div class="flex justify-between items-center border-t border-gray-100 dark:border-gray-700 pt-3">
-                                    <!-- Botón de Like (Visual por ahora) -->
-                                    <button class="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition group">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:fill-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                        </svg>
-                                        <span class="font-bold">{{ $photo->likes_count }}</span>
-                                    </button>
-
-                                    <button class="text-gray-500 hover:text-blue-500">
-                                        💬 {{ $photo->comments_count }}
-                                    </button>
-                                </div>
+                   @foreach($photos as $photo)
+                <div class="bg-white dark:bg-dark-card rounded-lg shadow-lg overflow-hidden transition hover:scale-105 duration-300 group">
+                    
+                    <!-- EL ENLACE PRINCIPAL (Envuelve imagen y datos) -->
+                    <!-- Al hacer clic aquí, te lleva a la vista detalle -->
+                    <a href="{{ route('photos.show', $photo->id) }}" class="block">
+                        
+                        <!-- Imagen -->
+                        <div class="h-64 overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
+                            <img src="{{ asset('storage/' . $photo->file_path) }}" 
+                                 alt="Foto de {{ $photo->user->name }}" 
+                                 class="w-full h-full object-cover transition duration-500 group-hover:opacity-90">
+                            
+                            <!-- Efecto Overlay: Muestra texto al pasar el mouse -->
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center">
+                                <span class="text-white opacity-0 group-hover:opacity-100 font-bold text-lg drop-shadow-md">Ver Foto 🔍</span>
                             </div>
                         </div>
-                    @endforeach
+
+                        <!-- Info del Usuario (Parte del enlace) -->
+                        <div class="p-4 pb-2">
+                            <p class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate group-hover:text-brand-orange transition">
+                                {{ $photo->user->name }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ $photo->created_at->diffForHumans() }}
+                            </p>
+                        </div>
+                    </a> 
+                    <!-- Fin del enlace -->
+
+                    <!-- Botones de Acción (SEPARADOS del enlace para que funcionen independientemente) -->
+                    <div class="px-4 pb-4 pt-2 flex justify-between items-center border-t border-gray-100 dark:border-gray-700">
+                        
+                        <!-- Botón de Like -->
+                        <button class="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition group/btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover/btn:fill-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span class="font-bold">{{ $photo->likes_count }}</span>
+                        </button>
+
+                        <!-- Indicador de Comentarios -->
+                        <span class="text-gray-500 text-sm flex items-center">
+                            💬 {{ $photo->comments_count }}
+                        </span>
+                    </div>
+
+                </div>
+            @endforeach
                 </div>
             @endif
         </div>
