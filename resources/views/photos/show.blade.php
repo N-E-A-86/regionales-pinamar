@@ -115,7 +115,7 @@
                     @auth
                         <form action="#" class="mt-4">
                             <textarea rows="3" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:ring-2 focus:ring-brand-orange focus:border-transparent" placeholder="Escribe un comentario..."></textarea>
-                            <button type="button" class="mt-2 w-full bg-brand-orange hover:bg-brand-orange-darker text-white font-bold py-2 px-4 rounded transition shadow-lg shadow-orange-500/20">
+                            <button type="button" class="mt-2 w-full bg-brand-orange hover:bg-brand-orange-darker text-black font-bold py-2 px-4 rounded transition shadow-lg shadow-orange-500/20">
                                 Publicar Comentario
                             </button>
                         </form>

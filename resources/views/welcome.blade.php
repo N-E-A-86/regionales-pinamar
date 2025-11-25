@@ -116,8 +116,14 @@
                                 {{ $photo->user->name }}
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ $photo->created_at->diffForHumans() }}
-                            </p>
+                        @if($photo->created_at->isToday())
+                            {{ $photo->created_at->diffForHumans() }}
+                        @elseif($photo->created_at->isYesterday())
+                            Ayer
+                        @else
+                            {{ $photo->created_at->format('d/m/Y') }}
+                        @endif
+                    </p>
                         </div>
                     </a> 
                     <!-- Fin del enlace -->
