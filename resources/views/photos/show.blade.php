@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Recuerdo de {{ $photo->user->name }} - Regionales Pinamar</title>
     
     <!-- Fonts & Styles -->
@@ -67,14 +68,26 @@
                     <div class="p-4 bg-dark-card border-t border-gray-800 flex items-center space-x-6">
                         
                         <!-- Botón LIKE (Estilo Reddit) -->
-                        <button class="flex items-center space-x-2 text-gray-400 hover:text-brand-orange transition group">
-                            <div class="p-2 rounded-full group-hover:bg-gray-800 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                            </div>
-                            <span class="font-bold text-lg">{{ $photo->likes_count }} <span class="hidden sm:inline">Me Gusta</span></span>
-                        </button>
+                        <@php
+    $isLiked = $photo->isLikedByAuthUser();
+@endphp
+
+<button onclick="toggleLike({{ $photo->id }}, this)" 
+        class="flex items-center space-x-2 transition group {{ $isLiked ? 'text-red-500' : 'text-gray-400 hover:text-brand-orange' }}">
+    
+    <div class="p-2 rounded-full group-hover:bg-gray-800 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" 
+             class="h-7 w-7 {{ $isLiked ? 'fill-current' : '' }}" 
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+    </div>
+    
+    <span class="font-bold text-lg">
+        <span class="like-count">{{ $photo->likes_count }}</span> 
+        <span class="hidden sm:inline">Me Gusta</span>
+    </span>
+</button>
 
                         <!-- Botón COMENTAR -->
                         <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition group">
@@ -132,6 +145,55 @@
 
         </div>
     </main>
+<script>
+    async function toggleLike(photoId, btn) {
+        // 1. Verificamos si el usuario está logueado (si no hay token csrf, es que no está logueado)
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!token) {
+            window.location.href = "{{ route('login') }}"; // Lo mandamos a loguear
+            return;
+        }
 
+        // 2. Referencias a los elementos visuales
+        const icon = btn.querySelector('svg');
+        const countSpan = btn.querySelector('.like-count');
+        
+        // Efecto visual inmediato (feedback táctil)
+        btn.classList.add('scale-125'); 
+        setTimeout(() => btn.classList.remove('scale-125'), 200);
+
+        try {
+            // 3. Enviamos la petición al servidor
+            const response = await fetch(`/photos/${photoId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            });
+
+            const data = await response.json();
+
+            // 4. Actualizamos el número y el color según lo que dijo el servidor
+            countSpan.innerText = data.likes_count;
+
+            if (data.liked) {
+                // Si dio like: Ponemos rojo y rellenamos el corazón
+                btn.classList.remove('text-gray-500');
+                btn.classList.add('text-red-500');
+                icon.classList.add('fill-current');
+            } else {
+                // Si quitó like: Ponemos gris y vaciamos el corazón
+                btn.classList.add('text-gray-500');
+                btn.classList.remove('text-red-500');
+                icon.classList.remove('fill-current');
+            }
+
+        } catch (error) {
+            console.error('Error al dar like:', error);
+            alert('Hubo un error al procesar tu like.');
+        }
+    }
+</script>
 </body>
 </html>

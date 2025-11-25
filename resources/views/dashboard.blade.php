@@ -1,3 +1,4 @@
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -20,6 +21,17 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="text-lg font-bold mb-4">📸 ¡Sube tu foto con el Mate!</h3>
                     
+                    <!-- Bloque para mostrar errores de validación -->
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    <strong class="font-bold">¡Ups! Algo salió mal:</strong>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
                     <form action="{{ route('photos.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf <!-- Llave de seguridad obligatoria -->
                         

@@ -30,5 +30,55 @@
                 {{ $slot }}
             </main>
         </div>
+        <script>
+    async function toggleLike(photoId, btn) {
+        // 1. Verificamos si el usuario está logueado (si no hay token csrf, es que no está logueado)
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!token) {
+            window.location.href = "{{ route('login') }}"; // Lo mandamos a loguear
+            return;
+        }
+
+        // 2. Referencias a los elementos visuales
+        const icon = btn.querySelector('svg');
+        const countSpan = btn.querySelector('.like-count');
+        
+        // Efecto visual inmediato (feedback táctil)
+        btn.classList.add('scale-125'); 
+        setTimeout(() => btn.classList.remove('scale-125'), 200);
+
+        try {
+            // 3. Enviamos la petición al servidor
+            const response = await fetch(`/photos/${photoId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            });
+
+            const data = await response.json();
+
+            // 4. Actualizamos el número y el color según lo que dijo el servidor
+            countSpan.innerText = data.likes_count;
+
+            if (data.liked) {
+                // Si dio like: Ponemos rojo y rellenamos el corazón
+                btn.classList.remove('text-gray-500');
+                btn.classList.add('text-red-500');
+                icon.classList.add('fill-current');
+            } else {
+                // Si quitó like: Ponemos gris y vaciamos el corazón
+                btn.classList.add('text-gray-500');
+                btn.classList.remove('text-red-500');
+                icon.classList.remove('fill-current');
+            }
+
+        } catch (error) {
+            console.error('Error al dar like:', error);
+            alert('Hubo un error al procesar tu like.');
+        }
+    }
+</script>
     </body>
 </html>

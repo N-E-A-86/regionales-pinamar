@@ -40,6 +40,11 @@ Route::middleware(['auth'])->group(function () {
     // 2. La Ruta para Subir Fotos
     Route::post('/photos', [PhotoController::class, 'store'])->name('photos.store');
 
+    // Ruta para Dar/Quitar Like (AJAX)
+    Route::post('/photos/{id}/like', [App\Http\Controllers\LikeController::class, 'toggle'])->name('likes.toggle');
+   // LA RUTA DEL LIKE ---
+    Route::post('/photos/{id}/like', [App\Http\Controllers\LikeController::class, 'toggle'])->name('likes.toggle');
+
 });
 
 // --- RUTAS DE GOOGLE ---

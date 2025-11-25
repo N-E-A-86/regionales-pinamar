@@ -25,4 +25,19 @@ class Photo extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Relación: Una foto tiene muchos likes
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    // Función auxiliar para saber si el usuario actual le dio like
+    public function isLikedByAuthUser()
+    {
+        if (!auth()->check()) return false;
+        
+        // Busca si existe un like del usuario conectado en esta foto
+        return $this->likes()->where('user_id', auth()->id())->exists();
+    }
 }
