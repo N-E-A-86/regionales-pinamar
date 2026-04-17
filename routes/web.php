@@ -12,16 +12,10 @@ use App\Http\Controllers\AdminController;
 */
 
 // PÁGINA DE INICIO (PÚBLICA)
-
-// Página de Ranking
-Route::get('/ranking', [PhotoController::class, 'ranking'])->name('ranking');
-
-    
 Route::get('/', function () {
     // Buscamos SOLO las fotos aprobadas, de la más nueva a la más vieja
     // Eager loading de 'user' para no hacer muchas consultas
     $photos = App\Models\Photo::with('user')
-                ->withCount('comments') // <--- Cuenta los comentarios reales
                 ->where('status', 'approved')
                 ->latest()
                 ->get();
@@ -35,14 +29,12 @@ Route::get('/photos/{id}', [PhotoController::class, 'show'])->name('photos.show'
 Route::middleware(['auth'])->group(function () {
     
     // 1. El Dashboard (ACTUALIZADO: Ahora busca las fotos antes de mostrar la vista)
-   // Dashboard (Ahora carga fotos Y promociones)
     Route::get('/dashboard', function () {
+        // Buscamos las fotos del usuario logueado
         $photos = Illuminate\Support\Facades\Auth::user()->photos()->latest()->get();
         
-        // Traemos las promos activas
-        $promotions = App\Models\Promotion::where('is_active', true)->latest()->get();
-        
-        return view('dashboard', compact('photos', 'promotions'));
+        // Enviamos la variable $photos a la vista
+        return view('dashboard', compact('photos'));
     })->name('dashboard');
 
     // 2. La Ruta para Subir Fotos
@@ -53,19 +45,6 @@ Route::middleware(['auth'])->group(function () {
    // LA RUTA DEL LIKE ---
     Route::post('/photos/{id}/like', [App\Http\Controllers\LikeController::class, 'toggle'])->name('likes.toggle');
 
-    // Ruta para Agregar Comentario
-    Route::post('/photos/{id}/comment', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
-
-    // Ruta para Borrar Comentario
-    Route::delete('/comments/{id}', [App\Http\Controllers\CommentController::class, 'destroy'])->name('comments.destroy');
-
-
-    // Gestión de Promociones (Admin y Moderadores)
-    Route::post('/admin/promotions', [App\Http\Controllers\PromotionController::class, 'store'])->name('promotions.store');
-    Route::delete('/admin/promotions/{id}', [App\Http\Controllers\PromotionController::class, 'destroy'])->name('promotions.destroy');
-
-    // Ruta para borrar fotos
-    Route::delete('/photos/{id}', [PhotoController::class, 'destroy'])->name('photos.destroy');
 });
 
 // --- RUTAS DE GOOGLE ---

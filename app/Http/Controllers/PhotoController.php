@@ -35,8 +35,8 @@ class PhotoController extends Controller
 // Mostrar una foto individual en grande
     public function show($id)
     {
-        // Buscamos la foto, su dueño, sus comentarios y los dueños de los comentarios
-$photo = Photo::with(['user', 'comments.user'])->findOrFail($id);
+        // Buscamos la foto por ID, y traemos también los datos del usuario dueño
+        $photo = Photo::with('user')->findOrFail($id);
 
         // Si la foto no está aprobada y el que mira NO es el dueño ni admin, error 404
         if ($photo->status != 'approved') {
@@ -46,39 +46,5 @@ $photo = Photo::with(['user', 'comments.user'])->findOrFail($id);
         }
 
         return view('photos.show', compact('photo'));
-    }
-
-
-
-    // Página de Ranking / Los Más Populares
-    public function ranking()
-    {
-        // Traemos las 10 fotos con más likes
-        $topPhotos = Photo::with('user')
-                          ->where('status', 'approved')
-                          ->orderBy('likes_count', 'desc') // Ordenar de mayor a menor
-                          ->take(05) // Solo las 10 mejores
-                          ->get();
-
-        return view('ranking', compact('topPhotos'));
-    }
-    // Borrar foto (Acción para el Admin o el Dueño)
-    public function destroy($id)
-    {
-        $photo = Photo::findOrFail($id);
-
-        // Seguridad: Solo Admin o el dueño pueden borrar
-        if (auth()->check() && (auth()->user()->role == 'admin' || auth()->id() == $photo->user_id)) {
-            
-            // 1. (Opcional) Borrar archivo del disco para no ocupar espacio
-            // \Illuminate\Support\Facades\Storage::disk('public')->delete($photo->file_path);
-
-            // 2. Borrar de la base de datos
-            $photo->delete();
-
-            return back()->with('status', 'Foto eliminada correctamente.');
-        }
-
-        abort(403, 'No tienes permiso.');
     }
 }

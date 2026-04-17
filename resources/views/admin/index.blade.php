@@ -7,27 +7,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-
-        <!-- SECCIÓN: CREAR PROMOCIÓN (Solo Admin) -->
-            <div class="bg-white dark:bg-dark-card overflow-hidden shadow-sm sm:rounded-lg mb-8 border border-orange-200 dark:border-orange-900">
-                <div class="p-6">
-                    <h3 class="text-lg font-bold mb-4 text-brand-orange">🎁 Crear Nueva Promoción</h3>
-                    <form action="{{ route('promotions.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4 md:flex-row">
-                        @csrf
-                        <div class="flex-1">
-                            <input type="text" name="title" placeholder="Título (ej: 10% OFF)" required class="w-full rounded bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 mb-2">
-                            <input type="text" name="description" placeholder="Descripción corta..." required class="w-full rounded bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700">
-                        </div>
-                        <div class="flex-1">
-                            <input type="file" name="image" required class="text-sm text-gray-500">
-                        </div>
-                        <button type="submit" class="bg-brand-orange hover:bg-brand-orange-darker text-white font-bold py-2 px-6 rounded h-10 self-center">
-                            Publicar
-                        </button>
-                    </form>
-                </div>
-            </div>
             
             <!-- Mensajes de Feedback (Aprobado/Rechazado) -->
             @if (session('status'))

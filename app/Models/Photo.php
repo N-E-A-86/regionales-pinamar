@@ -40,9 +40,4 @@ class Photo extends Model
         // Busca si existe un like del usuario conectado en esta foto
         return $this->likes()->where('user_id', auth()->id())->exists();
     }
-    // Relación: Una foto tiene comentarios
-    public function comments()
-{
-    return $this->hasMany(Comment::class)->latest(); // Los más nuevos primero
-}
 }

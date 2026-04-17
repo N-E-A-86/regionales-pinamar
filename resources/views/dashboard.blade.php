@@ -20,7 +20,7 @@
             <div class="bg-white dark:bg-dark-card overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="text-lg font-bold mb-4">📸 ¡Sube tu foto con el Mate!</h3>
-
+                    
                     <!-- Bloque para mostrar errores de validación -->
             @if ($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -56,38 +56,6 @@
                     </form>
                 </div>
             </div>
-
-               <!-- SECCIÓN: PROMOCIONES ACTIVAS -->
-            @if($promotions->count() > 0)
-                <div class="mb-10">
-                    <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">🎁 Tus Recompensas Disponibles</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        @foreach($promotions as $promo)
-                            <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg shadow-lg overflow-hidden text-white flex relative">
-                                <!-- Imagen Promo -->
-                                <div class="w-1/3 bg-black">
-                                    <img src="{{ asset('storage/' . $promo->image_path) }}" class="h-full w-full object-cover opacity-80">
-                                </div>
-                                <!-- Texto -->
-                                <div class="w-2/3 p-4 flex flex-col justify-center">
-                                    <h4 class="font-bold text-xl">{{ $promo->title }}</h4>
-                                    <p class="text-sm opacity-90 mt-1">{{ $promo->description }}</p>
-                                    <p class="text-xs mt-3 font-mono bg-white bg-opacity-20 inline-block px-2 py-1 rounded">
-                                        Muestra esto en caja
-                                    </p>
-                                </div>
-                                <!-- Botón Borrar (Solo visible para Admin, por si la ve desde aquí) -->
-                                @if(auth()->user()->role == 'admin')
-                                    <form action="{{ route('promotions.destroy', $promo->id) }}" method="POST" class="absolute top-2 right-2">
-                                        @csrf @method('DELETE')
-                                        <button class="text-white hover:text-gray-200 bg-black bg-opacity-50 rounded-full p-1">❌</button>
-                                    </form>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
 
         <!-- SECCIÓN: MIS RECUERDOS -->
             <div class="mt-8">
