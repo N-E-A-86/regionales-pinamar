@@ -78,8 +78,15 @@
                             🚀 Participar Ahora
                         </a>
                     @endauth
+                    
                 </div>
             </div>
+            <!-- Enlace al Ranking -->
+            <div class="mt-6">
+    <a href="{{ route('ranking') }}" class="text-brand-orange hover:text-white font-bold text-lg border-b-2 border-brand-orange hover:bg-brand-orange px-2 py-1 transition">
+        🏆 Ver Ranking de Ganadores
+    </a>
+</div>
         </div>
 
         <!-- Galería de Fotos -->
@@ -99,17 +106,32 @@
                     <!-- Al hacer clic aquí, te lleva a la vista detalle -->
                     <a href="{{ route('photos.show', $photo->id) }}" class="block">
                         
-                        <!-- Imagen -->
-                        <div class="h-64 overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
-                            <img src="{{ asset('storage/' . $photo->file_path) }}" 
-                                 alt="Foto de {{ $photo->user->name }}" 
-                                 class="w-full h-full object-cover transition duration-500 group-hover:opacity-90">
-                            
-                            <!-- Efecto Overlay: Muestra texto al pasar el mouse -->
-                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center">
-                                <span class="text-white opacity-0 group-hover:opacity-100 font-bold text-lg drop-shadow-md">Ver Foto 🔍</span>
-                            </div>
-                        </div>
+                        <!-- Imagen --><div class="h-64 overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
+    
+    <img src="{{ asset('storage/' . $photo->file_path) }}" 
+        alt="Foto de {{ $photo->user->name }}" 
+        class="w-full h-full object-cover transition duration-500 group-hover:opacity-90">
+    
+    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center">
+        <span class="text-white opacity-0 group-hover:opacity-100 font-bold text-lg drop-shadow-md">Ver Foto 🔍</span>
+    </div>
+    
+    @if(auth()->check() && auth()->user()->role == 'admin')
+        <div class="absolute top-2 right-2 z-20">
+            <form action="{{ route('photos.destroy', $photo->id) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit" 
+                        class="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 shadow-lg transition transform hover:scale-110"
+                        onclick="return confirm('⚠️ ¿ADMIN: Estás seguro de borrar esta foto pública?');">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    @endif
+    </div>
 
                         <!-- Info del Usuario (Parte del enlace) -->
                         <div class="p-4 pb-2">
@@ -146,13 +168,23 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
     </svg>
     
-    <span class="font-bold like-count">{{ $photo->likes_count }}</span>
+   <span class="font-bold like-count text-white">{{ $photo->likes_count }}</span>
 </button>
 
-                        <!-- Indicador de Comentarios -->
-                        <span class="text-gray-500 text-sm flex items-center">
-                            💬 {{ $photo->comments_count }}
-                        </span>
+                        <!-- Indicador de Comentarios (Ahora es un enlace) -->
+                        <!-- <a href="{{ route('photos.show', $photo->id) }}" 
+                         class="flex items-center text-gray-500 hover:text-blue-500 transition text-sm font-medium z-10 relative">
+                            <span class="mr-1">💬</span>
+                            {{ $photo->comments_count }}
+                        </a> -->
+                        <a href="{{ route('photos.show', $photo->id) }}" 
+                      class="flex items-center text-white hover:text-yellow-300 transform transition duration-300 text-base font-medium z-10 relative hover:scale-105">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H2a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2zM7 7H5v2h2V7zm2 0h2v2H9V7zm4 0h2v2h-2V7z" clip-rule="evenodd" />
+    </svg>
+    Comentarios
+    {{ $photo->comments_count }}
+</a>
                     </div>
 
                 </div>

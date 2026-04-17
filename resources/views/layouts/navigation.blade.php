@@ -4,22 +4,22 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-10 w-auto fill-current text-gray-600" />
-                    </a>
-                </div>
+               <div class="shrink-0 flex items-center">
+    <a href="{{ url('/') }}" class="flex items-center">
+        <span class="text-2xl font-bold text-brand-orange">🧉 Regionales Pinamar</span>
+    </a>
+</div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Mi Panel') }}
-                    </x-nav-link>
+               <div class="flex space-x-8 sm:-my-px sm:ml-10"> 
+    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+        {{ __('Mi Panel') }}
+    </x-nav-link>
                    <!-- Enlace al Panel de Admin (Solo visible para admins) -->
                 @if(Auth::user()->role === 'admin')
-                    <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.*')" class="text-red-500">
-                        🛡️ {{ __('Admin Panel') }}
-                    </x-nav-link>
+        <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.*')" class="text-red-500">
+            🛡️ {{ __('Admin Panel') }}
+        </x-nav-link>
                 @endif
                 </div>
             </div>

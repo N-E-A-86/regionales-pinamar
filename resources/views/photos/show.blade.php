@@ -68,9 +68,9 @@
                     <div class="p-4 bg-dark-card border-t border-gray-800 flex items-center space-x-6">
                         
                         <!-- Botón LIKE (Estilo Reddit) -->
-                        <@php
-    $isLiked = $photo->isLikedByAuthUser();
-@endphp
+                        @php
+                         $isLiked = $photo->isLikedByAuthUser();
+                          @endphp
 
 <button onclick="toggleLike({{ $photo->id }}, this)" 
         class="flex items-center space-x-2 transition group {{ $isLiked ? 'text-red-500' : 'text-gray-400 hover:text-brand-orange' }}">
@@ -96,11 +96,13 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 4.418 9 8z" />
                                 </svg>
                             </div>
-                            <span class="font-bold text-lg">{{ $photo->comments_count }} <span class="hidden sm:inline">Comentarios</span></span>
+                            <span class="font-bold text-lg">{{ $photo->comments->count() }} <span class="hidden sm:inline">Comentarios</span></span>
                         </button>
 
                         <!-- Botón COMPARTIR (Extra) -->
-                        <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400 transition group ml-auto">
+                        <!-- Botón COMPARTIR (Funcional) -->
+                        <button onclick="sharePhoto('{{ route('photos.show', $photo->id) }}', '{{ $photo->user->name }}')" 
+                                class="flex items-center space-x-2 text-gray-400 hover:text-green-400 transition group ml-auto">
                             <div class="p-2 rounded-full group-hover:bg-gray-800 transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -113,28 +115,72 @@
             </div>
 
             <!-- COLUMNA DERECHA: Sidebar de Comentarios (Estilo StackOverflow/Facebook) -->
+            <!-- COLUMNA DERECHA: Sidebar de Comentarios -->
             <div class="lg:col-span-1">
                 <div class="bg-dark-card border border-gray-800 rounded-lg p-6 shadow-lg sticky top-24">
-                    <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">Comentarios</h3>
+                    <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">
+                        Comentarios ({{ $photo->comments->count() }})
+                    </h3>
                     
-                    <!-- Lista de Comentarios (Placeholder por ahora) -->
-                    <div class="space-y-4 mb-6 max-h-96 overflow-y-auto custom-scrollbar">
-                        <p class="text-gray-500 text-center py-4 italic">
-                            Aún no hay comentarios. ¡Sé el primero en opinar sobre este mate!
-                        </p>
+                    <!-- Lista de Comentarios -->
+                    <div class="space-y-4 mb-6 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                        @if($photo->comments->isEmpty())
+                            <p class="text-gray-500 text-center py-4 italic">
+                                Aún no hay comentarios. ¡Sé el primero en opinar!
+                            </p>
+                        @else
+                            @foreach($photo->comments as $comment)
+                                <div class="flex space-x-3">
+                                    <!-- Avatar pequeño -->
+                                    <div class="flex-shrink-0">
+                                        <div class="h-8 w-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-white font-bold">
+                                            {{ substr($comment->user->name, 0, 1) }}
+                                        </div>
+                                    </div>
+                                    <!-- Contenido -->
+                                    <div class="flex-1 bg-gray-800 rounded-lg p-3 text-sm">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-bold text-white">{{ $comment->user->name }}</span>
+                                            <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <p class="text-gray-300">{{ $comment->body }}</p>
+
+                                        <!-- Botón de Borrar (Solo Admin) -->
+                    @if(Auth::check() && (Auth::user()->role == 'admin' || Auth::id() == $comment->user_id))
+                        <div class="mt-2 flex justify-end">
+                            <form action="{{ route('comments.destroy', $comment->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs text-red-500 hover:text-orange-400 flex items-center" onclick="return confirm('¿Borrar este comentario?')">
+                                    🗑️ Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+
+
+
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
 
                     <!-- Formulario de Comentario -->
                     @auth
-                        <form action="#" class="mt-4">
-                            <textarea rows="3" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:ring-2 focus:ring-brand-orange focus:border-transparent" placeholder="Escribe un comentario..."></textarea>
-                            <button type="button" class="mt-2 w-full bg-brand-orange hover:bg-brand-orange-darker text-black font-bold py-2 px-4 rounded transition shadow-lg shadow-orange-500/20">
+                        <form action="{{ route('comments.store', $photo->id) }}" method="POST" class="mt-4">
+                            @csrf
+                            <textarea name="body" rows="3" required
+                                class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:ring-2 focus:ring-brand-orange focus:border-transparent placeholder-gray-500" 
+                                placeholder="Escribe un comentario..."></textarea>
+                            
+                            <button type="submit" class="mt-2 w-full bg-brand-orange hover:bg-brand-orange-darker text-white font-bold py-2 px-4 rounded transition shadow-lg shadow-orange-500/20">
                                 Publicar Comentario
                             </button>
                         </form>
                     @else
                         <div class="bg-gray-900 rounded p-4 text-center border border-gray-800">
-                            <p class="text-gray-400 text-sm mb-3">Inicia sesión para dejar un comentario y darle like.</p>
+                            <p class="text-gray-400 text-sm mb-3">Inicia sesión para dejar un comentario.</p>
                             <a href="{{ route('login') }}" class="block w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded border border-gray-600 transition">
                                 Iniciar Sesión
                             </a>
@@ -192,6 +238,32 @@
         } catch (error) {
             console.error('Error al dar like:', error);
             alert('Hubo un error al procesar tu like.');
+        }
+    }
+    // Función para compartir
+    async function sharePhoto(url, userName) {
+        const shareData = {
+            title: 'Regionales Pinamar',
+            text: `¡Mira la foto de ${userName} con el Mate Gigante!`,
+            url: url
+        };
+
+        // 1. Intentar usar el menú nativo del celular (WhatsApp, etc)
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('Error al compartir:', err);
+            }
+        } else {
+            // 2. Si es PC, copiar al portapapeles
+            try {
+                await navigator.clipboard.writeText(url);
+                // Feedback visual simple
+                alert('¡Enlace copiado al portapapeles!');
+            } catch (err) {
+                prompt('Copia este enlace:', url);
+            }
         }
     }
 </script>
