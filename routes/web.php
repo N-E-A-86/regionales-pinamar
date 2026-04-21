@@ -2,8 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AdminController;
+use App\Models\Photo;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +29,20 @@ Route::get('/', function () {
 // Ver foto individual
 Route::get('/photos/{id}', [PhotoController::class, 'show'])->name('photos.show');
 
+// Ranking/Salón de la Fama (Fotos más votadas)
+Route::get('/ranking', function () {
+    $photos = Photo::with('user')
+                ->where('status', 'approved')
+                ->orderBy('likes_count', 'desc')
+                ->take(20)
+                ->get();
+
+    return view('ranking', compact('photos'));
+})->name('ranking');
+
+// Página de Promociones (pública)
+Route::get('/promociones', [PromotionController::class, 'index'])->name('promotions.index');
+
 // --- GRUPO DE RUTAS PROTEGIDAS (Solo usuarios logueados) ---
 Route::middleware(['auth'])->group(function () {
     
@@ -41,9 +59,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/photos', [PhotoController::class, 'store'])->name('photos.store');
 
     // Ruta para Dar/Quitar Like (AJAX)
-    Route::post('/photos/{id}/like', [App\Http\Controllers\LikeController::class, 'toggle'])->name('likes.toggle');
-   // LA RUTA DEL LIKE ---
-    Route::post('/photos/{id}/like', [App\Http\Controllers\LikeController::class, 'toggle'])->name('likes.toggle');
+    Route::post('/photos/{id}/like', [LikeController::class, 'toggle'])->name('likes.toggle');
+
+    // Ruta para Comentar en fotos
+    Route::post('/photos/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
+
+    // Ruta para Eliminar un comentario propio
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 });
 
@@ -55,13 +77,20 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 
 // --- ZONA DE ADMINISTRACIÓN (Solo Admin) ---
 Route::middleware(['auth', 'admin'])->group(function () {
-    
+
     // Ver el panel
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    
+
     // Botones de acción
     Route::put('/admin/photos/{id}/approve', [AdminController::class, 'approve'])->name('admin.approve');
     Route::put('/admin/photos/{id}/reject', [AdminController::class, 'reject'])->name('admin.reject');
+
+    // Gestión de Comentarios (admin)
+    Route::delete('/admin/comments/{id}', [CommentController::class, 'destroy'])->name('admin.comments.destroy');
+
+    // Gestión de Promociones (admin)
+    Route::post('/admin/promotions', [PromotionController::class, 'store'])->name('admin.promotions.store');
+    Route::delete('/admin/promotions/{id}', [PromotionController::class, 'destroy'])->name('admin.promotions.destroy');
 
 });
 require __DIR__.'/auth.php';
